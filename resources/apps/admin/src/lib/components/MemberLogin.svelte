@@ -56,22 +56,16 @@
 			.finally(() => (loading = false));
 	};
 
-	const onLogActivity = async () => {
+	const onSubmit = async () => {
 		try {
 			loading = true;
 
-			let description;
-
-			if (type === 'login') {
-				description = `User ${user.id} : ${user.name} has logged in`;
-			} else if (type === 'logout') {
-				description = `User ${user.id} : ${user.name} has logged out`;
-			}
+			const description = `Member ${user.name} logged in`;
 
 			await api.post('/activities', {
 				entity_id: user.id,
 				description,
-				type: 'attendance'
+				type: 'system'
 			});
 
 			toast.trigger({
@@ -175,11 +169,7 @@
 	</div>
 	{#if user}
 		<div class="flex items-center border-t p-4">
-			<form class="flex flex-1 items-center gap-4" on:submit={onLogActivity}>
-				<select class="select" bind:value={type} name="type" required>
-					<option value="login">{$_('memberloginr')}</option>
-					<option value="logout">{$_('memberlogoutr')}</option>
-				</select>
+			<form class="flex flex-1 items-center gap-4" on:submit={onSubmit}>
 				<button class="btn variant-filled"> {$_('logstat')} </button>
 			</form>
 		</div>

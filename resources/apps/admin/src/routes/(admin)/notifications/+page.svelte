@@ -4,7 +4,6 @@
 	import { Paginator } from '@skeletonlabs/skeleton';
 	import { getBearerToken, useApi } from '$lib/api';
 	import { onMount } from 'svelte';
-
 	import moment from 'moment';
 
 	const api = useApi({
@@ -17,33 +16,35 @@
 	let totalItems = 0;
 	let perPage = 15;
 
-	let title = $_('tisacts');
+	let title = $_('notifications');
 
 	const loadItems = () => {
 		if (loading) return;
 		loading = true;
-		api.get('/activities', {
+		api.get('/notifications', {
 			params: {
 				page: currentPage,
 				per_page: perPage
 			}
 		})
 			.then((response) => {
-				console.log('Activities response:', response.data);
-				if (response.data && response.data.data) {
-					items = response.data.data;
-					currentPage = response.data.current_page;
-					totalItems = response.data.total;
-				} else {
-					console.error('Invalid response format:', response.data);
-					items = [];
-				}
-			})
-			.catch((error) => {
-				console.error('Error loading activities:', error);
-				items = [];
+				items = response.data.data;
+				currentPage = response.data.current_page;
+				totalItems = response.data.total;
 			})
 			.finally(() => (loading = false));
+	};
+
+	const markAsRead = (id) => {
+		api.put(`/notifications/${id}/read`)
+			.then(() => {
+				items = items.map(item => {
+					if (item.id === id) {
+						return { ...item, read: true };
+					}
+					return item;
+				});
+			});
 	};
 
 	onMount(() => loadItems());
@@ -64,28 +65,43 @@
 	<div class="card bg-white p-4 lg:p-6">
 		<header class="card-header mb-6 flex items-center">
 			<h3 class="h3">{title}</h3>
-			<div class="flex-1"></div>
 		</header>
-		<!-- Responsive Container (recommended) -->
 		<div class="table-container">
-			<!-- Native Table Element -->
 			<table class="table-hover table bg-white">
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>{$_('desc')}</th>
-						<th>{$_('date')}</th>
+						<th>Type</th>
+						<th>Message</th>
+						<th>Date</th>
+						<th>Status</th>
+						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each items as item}
-						<tr>
-							<td>{item.id}</td>
+						<tr class={item.read ? 'opacity-50' : ''}>
 							<td>
-								{item.description}
+								<span class="badge {item.type === 'expiring' ? 'variant-filled-warning' : 'variant-filled-error'}">
+									{item.type}
+								</span>
+							</td>
+							<td>{item.message}</td>
+							<td>{moment(item.created_at).format('LLL')}</td>
+							<td>
+								<span class="badge {item.read ? 'variant-filled-success' : 'variant-filled-primary'}">
+									{item.read ? 'Read' : 'Unread'}
+								</span>
 							</td>
 							<td>
-								{moment(item.created_at).format('LL')}
+								{#if !item.read}
+									<button
+										type="button"
+										class="btn btn-sm variant-filled-primary"
+										on:click={() => markAsRead(item.id)}
+									>
+										Mark as Read
+									</button>
+								{/if}
 							</td>
 						</tr>
 					{/each}
@@ -109,4 +125,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</div> 

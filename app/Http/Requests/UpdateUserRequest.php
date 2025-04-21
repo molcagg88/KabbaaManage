@@ -24,10 +24,17 @@ class UpdateUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'email',
-            'name' => 'string',
+            'email' => 'nullable|email',
+            'name' => 'required|string',
             'password' => 'string|min:5|max:20',
-            'password_confirmation' => 'string|min:5|max:20|same:password'
+            'password_confirmation' => 'string|min:5|max:20|same:password',
+            'phone_number' => 'required|string|min:10|max:12|regex:/^[0-9]+$/',
+            'address' => 'string|nullable',
+            'city' => 'string|nullable',
+            'state' => 'string|nullable',
+            'country' => 'string|nullable',
+            'postcode' => 'string|nullable',
+            'newsletter' => 'boolean|nullable'
         ];
     }
 }

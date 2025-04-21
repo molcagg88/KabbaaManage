@@ -112,10 +112,12 @@
   "suspendedat": "Suspended At:",
   "validuntil": "Valid Until:",
   "noservsttatchd": "No service attached to this package.",
-  "membesusadd": "Member Subscription"
-
-
-
-
-
+  "membesusadd": "Member Subscription",
+  "nattendance": "Attendance",
+  "tattendance": "Attendance Tracking",
+  "markattendance": "Mark Attendance",
+  "noselected": "Please select at least one member",
+  "attendancemarked": "Attendance marked successfully",
+  "lastattendance": "Last Attendance",
+  "never": "Never"
 }

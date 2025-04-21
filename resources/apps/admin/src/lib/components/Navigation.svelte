@@ -3,16 +3,17 @@
 	import { _ } from 'svelte-i18n';
 	import Dashboard from 'svelte-icons/fa/FaHome.svelte';
 	import Activities from 'svelte-icons/fa/FaUserClock.svelte';
-	import Attendance from 'svelte-icons/fa/FaCalendar.svelte';
 	import Members from 'svelte-icons/fa/FaUsers.svelte';
 	import Subscriptions from 'svelte-icons/fa/FaCreditCard.svelte';
 	import Packages from 'svelte-icons/fa/FaBox.svelte';
 	import Services from 'svelte-icons/fa/FaServer.svelte';
 	import Cycles from 'svelte-icons/fa/FaCalendarPlus.svelte';
+	import Attendance from 'svelte-icons/fa/FaClipboardCheck.svelte';
 	// import Settings from 'svelte-icons/fa/FaCog.svelte';
 	// import Account from 'svelte-icons/fa/FaUserCog.svelte';
 	import Logout from 'svelte-icons/fa/FaSignOutAlt.svelte';
 	import Branches from 'svelte-icons/fa/FaBuilding.svelte';
+	import Notifications from 'svelte-icons/fa/FaBell.svelte';
 
 	import { getDrawerStore } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
@@ -43,11 +44,6 @@
 			icon: Activities
 		},
 		{
-			path: '/attendance',
-			name: $_('natt'),
-			icon: Attendance
-		},
-		{
 			path: '/members',
 			name: $_('nmem'),
 			icon: Members
@@ -56,6 +52,11 @@
 			path: '/branches',
 			name: $_('nbran'),
 			icon: Branches
+		},
+		{
+			path: '/notifications',
+			name: $_('notifications'),
+			icon: Notifications
 		},
 		{
 			path: '/subscriptions',
@@ -76,6 +77,11 @@
 			path: '/cycles',
 			name: $_('ncycles'),
 			icon: Cycles
+		},
+		{
+			path: '/attendance',
+			name: $_('nattendance'),
+			icon: Attendance
 		},
 		// {
 		// 	path: '/account',

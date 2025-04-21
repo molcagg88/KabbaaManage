@@ -1,7 +1,8 @@
 // @ts-nocheck
 
 export async function load({ cookies }) {
+	const token = cookies.get('token');
 	return {
-		token: cookies.get('token')
+		token: token || ''
 	};
 }

@@ -25,5 +25,12 @@ export const getBearerToken = () => {
 };
 
 export const useApi = (headers = {}) => {
-	return axios.create({ headers, baseURL: PUBLIC_API_URL + '/api' });
+	const token = getBearerToken();
+	return axios.create({
+		headers: {
+			...headers,
+			...(token ? { Authorization: token } : {})
+		},
+		baseURL: PUBLIC_API_URL + '/api'
+	});
 };

@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Services\UserAuthService;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -31,6 +33,8 @@ class UserController extends Controller
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('email')
             ])
+            ->with(['attendances', 'profile'])
+            ->select('users.*')
             ->paginate(request()->get('per_page', 15))
             ->appends(request()->query());
 
@@ -45,7 +49,15 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $this->userAuthService->register($request->email, $request->password, $request->name);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'password' => bcrypt(Str::random(10)) // Generate a random password
+        ]);
+
+        // Create profile
+        $user->profile()->create([]);
 
         return response()->json(['success' => true], 201);
     }
@@ -90,8 +102,11 @@ class UserController extends Controller
             $user->name = $request->name;
         }
 
+        if ($request->has('phone_number')) {
+            $user->phone_number = $request->phone_number;
+        }
+
         $profile = [
-            'contact_number',
             'address',
             'city',
             'state',
@@ -100,11 +115,8 @@ class UserController extends Controller
             'newsletter'
         ];
 
-        if (
-            $request->hasAny($profile)
-        ) {
+        if ($request->hasAny($profile)) {
             $user->profile()->update($request->only([
-                'contact_number',
                 'address',
                 'city',
                 'state',
@@ -134,6 +146,37 @@ class UserController extends Controller
         }
 
         $user->delete();
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Bulk delete multiple users
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id'
+        ]);
+
+        // Prevent deleting admin users
+        $adminIds = User::whereIn('id', $request->ids)
+            ->where('is_admin', true)
+            ->pluck('id')
+            ->toArray();
+
+        if (!empty($adminIds)) {
+            return response()->json([
+                'message' => 'Cannot delete admin users',
+                'admin_ids' => $adminIds
+            ], 400);
+        }
+
+        User::whereIn('id', $request->ids)->delete();
 
         return response()->json(null, 204);
     }

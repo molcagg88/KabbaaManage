@@ -86,10 +86,10 @@
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>{$_('nsu')}e</th>
+						<th>{$_('nsu')}</th>
 						<th>{$_('esu')}</th>
 						<th>{$_('bssu')}</th>
-						<th>{$_('sesu')}</th>
+						<th>{$_('psu')}</th>
 						<th>{$_('apsu')}</th>
 						<th>{$_('ssu')}</th>
 						<th>{$_('asu')}</th>
@@ -111,7 +111,7 @@
 								{item.package.cycle.name}
 							</td>
 							<td>
-								{item.package.services.length}
+								{item.package.name}
 							</td>
 							<td>
 								{parseFloat(item.package.amount).toFixed(2)}

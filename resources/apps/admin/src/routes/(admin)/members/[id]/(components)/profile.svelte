@@ -23,24 +23,15 @@
 
 	let fields = {
 		name: user.name,
-		contact_number: user.profile.contact_number,
-		address: user.profile.address,
-		city: user.profile.city,
-		state: user.profile.state,
-		country: user.profile.country,
-		postcode: user.profile.postcode,
+		phone_number: user.phone_number,
 		email: user.email,
-		newsletter: user.profile.newsletter,
 		status: user.status,
 		avatar: user.avatar
 	};
 
 	const onSubmit = () => {
 		loading = true;
-		api.put(`/users/${user.id}`, {
-			...fields,
-			country: fields.country && fields.country.code ? fields.country.code : fields.country
-		})
+		api.put(`/users/${user.id}`, fields)
 			.then(() => {
 				toast.trigger({
 					message: 'Successfully updated',
@@ -118,8 +109,7 @@
 				bind:value={fields.email}
 				name="email"
 				type="email"
-				required
-				readonly
+				placeholder="Optional"
 				disabled={loading}
 			/>
 		</label>
@@ -139,76 +129,16 @@
 			<span>{$_('conum')}</span>
 			<input
 				class="input"
-				bind:value={fields.contact_number}
-				name="contact_number"
+				bind:value={fields.phone_number}
+				name="phone_number"
 				type="tel"
 				required
+				maxlength="12"
+				pattern="[0-9]*"
 				disabled={loading}
 			/>
 		</label>
 	</div>
-
-	<div class="mb-4">
-		<label class="label">
-			<span>{$_('address')}</span>
-			<input
-				class="input"
-				bind:value={fields.address}
-				name="address"
-				type="text"
-				required
-				disabled={loading}
-			/>
-		</label>
-	</div>
-
-	<div class="mb-4 flex flex-row gap-4">
-		<label class="label flex-1">
-			<span>{$_('city')}</span>
-			<input
-				class="input"
-				bind:value={fields.city}
-				name="city"
-				type="text"
-				required
-				disabled={loading}
-			/>
-		</label>
-		<label class="label flex-1">
-			<span>{$_('pstate')}</span>
-			<input
-				class="input"
-				bind:value={fields.state}
-				name="state"
-				type="text"
-				required
-				disabled={loading}
-			/>
-		</label>
-	</div>
-
-	<div class="mb-4 flex flex-row gap-4">
-		<!-- svelte-ignore a11y-label-has-associated-control -->
-		<label class="label flex-1">
-			<span>{$_('country')}</span>
-			<CountrySelect bind:value={fields.country} />
-		</label>
-		<label class="label flex-1">
-			<span>{$_('postcode')}</span>
-			<input
-				class="input"
-				bind:value={fields.postcode}
-				name="postcode"
-				type="text"
-				required
-				disabled={loading}
-			/>
-		</label>
-	</div>
-
-	<SlideToggle name="slider-label" bind:checked={fields.newsletter}
-		>{$_('suscribe')}</SlideToggle
-	>
 
 	<div class="flex pt-8">
 		<button type="reset" class="btn variant-filled-error text-white" disabled={loading}

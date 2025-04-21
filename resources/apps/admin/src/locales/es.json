@@ -111,6 +111,12 @@
   "nlogout": "Logout",
   "suspendedat": "Suspendido el:",
   "validuntil": "Válido hasta:",
-  "noservsttatchd": "Este paquete no tiene servicios asignados."
-
-  }
+  "noservsttatchd": "Este paquete no tiene servicios asignados.",
+  "nattendance": "Asistencia",
+  "tattendance": "Seguimiento de Asistencia",
+  "markattendance": "Marcar Asistencia",
+  "noselected": "Por favor seleccione al menos un miembro",
+  "attendancemarked": "Asistencia marcada exitosamente",
+  "lastattendance": "Última Asistencia",
+  "never": "Nunca"
+}

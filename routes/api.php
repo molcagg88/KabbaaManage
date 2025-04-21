@@ -33,12 +33,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::apiResource('users', 'UserController');
         Route::apiResource('users.branches', 'UserBranchController')->except(['show', 'update', 'destroy']);
         Route::apiResource('activities', 'ActivityController');
+        Route::post('/users/bulk-delete', 'UserController@bulkDestroy');
         Route::get('/stats/subscriptions', 'StatisticsController@subscriptions');
         Route::get('/stats/services', 'StatisticsController@services');
         Route::get('/stats/members', 'StatisticsController@members');
         Route::get('/stats/packages', 'StatisticsController@packages');
         Route::post('/users/{user}/avatar', 'UserAvatarController@store');
     });
+    Route::apiResource('attendance', \App\Http\Controllers\Api\AttendanceController::class);
 });
 
 

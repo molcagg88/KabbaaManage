@@ -1,0 +1,68 @@
+We need to replace the current “Attendance” section with a new calendar‑based attendance system that supports:
+
+  1. Admin calendar UI (e.g. FullCalendar) to pick a date/time slot and select one or multiple members.
+  2. Filters by each member’s package or subscription status.
+  3. Usage‑tracking: show “remaining attendable days this week” per member, with a job that resets counts every Monday.
+  4. Attendance analytics:
+     • A month‑view heat‑map calendar.
+     • A weekly bar/line chart of total check‑ins by day.
+     • A daily hourly heat‑map (e.g. 6 AM–10 PM) showing peak attendance.
+
+Break this down into the following small steps:
+
+Step 1: Data Model  
+  • Extend or create tables/entities:  
+    - `MemberSubscription` (memberId, packageType, daysPerWeek, startDate, endDate).  
+    - `AttendanceRecord` (id, memberId, dateTime, createdBy).  
+    - `WeeklyUsage` (memberId, weekStartDate, usedDaysCount).  
+  • Add indices and foreign keys.
+
+Step 2: Backend APIs  
+  2.1. Subscription & Package Endpoints  
+    • GET `/api/subscriptions?memberId=` → details & remaining days.  
+    • GET `/api/subscriptions/filter?status=&packageType=`  
+  2.2. Attendance CRUD  
+    • POST `/api/attendance` { dateTime, memberIds[] }.  
+    • GET `/api/attendance?start=&end=&filters…`.  
+  2.3. Usage‑tracking  
+    • GET `/api/usage?memberId=&weekStart=` → used vs allowed days.  
+  2.4. Analytics  
+    • GET `/api/analytics/heatmap?month=` → daily counts.  
+    • GET `/api/analytics/weekly?start=` → counts per weekday.  
+    • GET `/api/analytics/hourly?date=` → counts per hour.
+
+Step 3: Weekly Reset Job  
+  • Create a scheduled job (e.g. cron Monday 00:00) that:  
+    - Inserts or resets `WeeklyUsage` rows for the new week.  
+    - Ensures `usedDaysCount` starts at 0.
+
+Step 4: Front‑End – Attendance Entry  
+  4.1. Calendar Component  
+    • Integrate FullCalendar.  
+    • On day‑click or time‑slot select → open multi‑select list of members.  
+  4.2. Filters Panel  
+    • Dropdowns/toggles for package type & subscription status → re‑query attendance API.
+
+Step 5: Front‑End – Usage Tracking UI  
+  • In the member‑select list show “X days left this week.”  
+  • Disable selecting members who hit their weekly limit (or highlight them).
+
+Step 6: Front‑End – Analytics Dashboard  
+  6.1. Month heat‑map  
+    • Use a library (e.g. react‑calendar‑heatmap).  
+  6.2. Weekly chart  
+    • Chart.js or Recharts bar/line chart.  
+  6.3. Daily hourly heat‑map  
+    • Custom grid or third‑party heatmap chart.
+
+Step 7: Testing & Validation  
+  • Unit tests for new APIs (Jest/Mocha).  
+  • E2E tests for:  
+    – Booking attendance.  
+    – Weekly‑reset logic.  
+    – Analytics data correctness.
+
+Step 8: Documentation & Deployment  
+  • Update API docs (Swagger/OpenAPI).  
+  • Front‑end component README.  
+  • Migration scripts for new tables/columns.

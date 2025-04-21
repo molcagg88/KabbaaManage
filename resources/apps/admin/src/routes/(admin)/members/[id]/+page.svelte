@@ -10,8 +10,6 @@
 	import { getAvatarUrl } from '$lib/avatar';
 
 	import Profile from './(components)/profile.svelte';
-	import Security from './(components)/security.svelte';
-	import Activities from './(components)/activities.svelte';
 	import Branches from './(components)/branches.svelte';
 	import Subscriptions from './(components)/subscriptions.svelte';
 
@@ -86,20 +84,6 @@
 							href="/">{$_('branches')}</a
 						>
 					</li>
-					<li>
-						<a
-							class={active === 'activities' ? 'active' : ''}
-							on:click|preventDefault={() => (active = 'activities')}
-							href="/">{$_('activities')}</a
-						>
-					</li>
-					<li>
-						<a
-							class={active === 'security' ? 'active' : ''}
-							on:click|preventDefault={() => (active = 'security')}
-							href="/">{$_('sandp')}</a
-						>
-					</li>
 				</ul>
 			</nav>
 		</div>
@@ -109,17 +93,11 @@
 					{#if active === 'profile'}
 						<Profile {user} on:avatar={(event) => (user.avatar = event.detail)} />
 					{/if}
-					{#if active === 'activities'}
-						<Activities {user} />
-					{/if}
 					{#if active === 'subscriptions'}
 						<Subscriptions {user} />
 					{/if}
 					{#if active === 'branches'}
 						<Branches {user} />
-					{/if}
-					{#if active === 'security'}
-						<Security {user} />
 					{/if}
 				{/if}
 			</div>

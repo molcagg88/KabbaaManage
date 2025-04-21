@@ -17,8 +17,7 @@
 	let fields = {
 		name: '',
 		email: '',
-		password: '',
-		password_confirmation: ''
+		phone_number: ''
 	};
 
 	const onSubmit = () => {
@@ -75,7 +74,6 @@
 						bind:value={fields.email}
 						name="email"
 						type="email"
-						required
 						disabled={loading}
 					/>
 				</label>
@@ -83,27 +81,16 @@
 
 			<div class="mb-4">
 				<label class="label">
-					<span>{$_('psw')}</span>
+					<span>{$_('conum')}</span>
 					<input
 						class="input"
-						bind:value={fields.password}
-						name="password"
-						type="password"
+						bind:value={fields.phone_number}
+						name="phone_number"
+						type="tel"
 						required
-						disabled={loading}
-					/>
-				</label>
-			</div>
-
-			<div class="mb-4">
-				<label class="label">
-					<span>{$_('pswc')}</span>
-					<input
-						class="input"
-						bind:value={fields.password_confirmation}
-						name="password_confirmation"
-						type="password"
-						required
+						minlength="10"
+						maxlength="12"
+						pattern="[0-9]*"
 						disabled={loading}
 					/>
 				</label>

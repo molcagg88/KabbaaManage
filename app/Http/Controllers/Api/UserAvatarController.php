@@ -16,30 +16,45 @@ class UserAvatarController extends Controller
             'avatar' => 'required|file|mimes:jpeg,png,jpg|max:10000'
         ]);
 
-        $manager = new ImageManager(['driver' => 'gd']);
-
-        $img = $manager->make($request->file('avatar'));
-
-        if ($img->height() > $img->width()) {
-            $img->resize(100, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-        } else {
-            $img->resize(null, 100, function ($constraint) {
-                $constraint->aspectRatio();
-            });
+        if (!extension_loaded('gd')) {
+            return response()->json([
+                'message' => 'GD Library extension is not available. Please contact your system administrator to enable it.',
+                'error' => 'GD_NOT_AVAILABLE'
+            ], 500);
         }
 
-        $file = $request->file('avatar')->hashName();
+        try {
+            $manager = new ImageManager(['driver' => 'gd']);
 
-        Storage::put('public/' . $file, $img->encode());
+            $img = $manager->make($request->file('avatar'));
 
-        $url = Storage::url($file);
+            if ($img->height() > $img->width()) {
+                $img->resize(100, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            } else {
+                $img->resize(null, 100, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            }
 
-        $user->avatar = $url;
+            $file = $request->file('avatar')->hashName();
 
-        $user->save();
+            Storage::put('public/' . $file, $img->encode());
 
-        return response()->json(['message' => 'successfully uploaded', 'path' => $url]);
+            $url = Storage::url($file);
+
+            $user->avatar = $url;
+
+            $user->save();
+
+            return response()->json(['message' => 'Successfully uploaded', 'path' => $url]);
+        } catch (\Exception $e) {
+            \Log::error('Avatar upload failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to process the image. Please try again or contact support.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

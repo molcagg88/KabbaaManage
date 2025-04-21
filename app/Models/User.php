@@ -15,7 +15,7 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
-    protected $appends = ['initial'];
+    protected $appends = ['initial', 'last_attendance'];
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'phone_number',
         'password',
         'is_admin',
         'status',
@@ -62,6 +63,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Profile::class);
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function getLastAttendanceAttribute()
+    {
+        $lastAttendance = $this->attendances()->latest()->first();
+        return $lastAttendance ? $lastAttendance->created_at->format('Y-m-d H:i:s') : null;
+    }
+
     /**
      * The "booted" method of the model.
      */
@@ -69,7 +81,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         static::created(function (User $user) {
             $user->account_number = User::generateAccountNumber($user->id);
-            $user->profile()->save(new Profile());
             $user->save();
         });
     }

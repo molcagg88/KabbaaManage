@@ -20,6 +20,8 @@
 	let loading = false;
 	let totalItems = 0;
 	let perPage = 15;
+	let selectedIds = [];
+	let selectAll = false;
 
 	let title = $_('timame');
 
@@ -28,8 +30,44 @@
 		if (confirm) {
 			items = items.filter((v) => v.id != id);
 			totalItems = totalItems - 1;
-			api.delete(`/members/${id}`);
+			api.delete(`/users/${id}`);
 		}
+	};
+
+	const onBulkDelete = () => {
+		if (selectedIds.length === 0) return;
+		
+		const confirm = window.confirm(`Are you sure you want to delete ${selectedIds.length} selected members?`);
+		if (confirm) {
+			api.post('/users/bulk-delete', { ids: selectedIds })
+				.then(() => {
+					items = items.filter((v) => !selectedIds.includes(v.id));
+					totalItems = totalItems - selectedIds.length;
+					selectedIds = [];
+					selectAll = false;
+				})
+				.catch((error) => {
+					alert(error.response?.data?.message || 'Error deleting members');
+				});
+		}
+	};
+
+	const onSelectAll = () => {
+		if (selectAll) {
+			selectedIds = items.map(item => item.id);
+		} else {
+			selectedIds = [];
+		}
+	};
+
+	const onSelectItem = (id) => {
+		const index = selectedIds.indexOf(id);
+		if (index === -1) {
+			selectedIds = [...selectedIds, id];
+		} else {
+			selectedIds = selectedIds.filter(itemId => itemId !== id);
+		}
+		selectAll = selectedIds.length === items.length;
 	};
 
 	const onEdit = (id) => goto(`/members/${id}`);
@@ -48,6 +86,9 @@
 				items = response.data.data;
 				currentPage = response.data.current_page;
 				totalItems = response.data.total;
+				// Reset selection when loading new page
+				selectedIds = [];
+				selectAll = false;
 			})
 			.finally(() => (loading = false));
 	};
@@ -60,13 +101,16 @@
 		size: totalItems,
 		amounts: [5, 10, 15, 20, 40, 60, 100]
 	};
+
+	// Handle selected state using a class on the root element
+	$: hasSelectedItems = selectedIds.length > 0;
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
 
-<div class="p-4 lg:p-6">
+<div class="p-4 lg:p-6" class:has-selected-items={hasSelectedItems}>
 	<div class="card bg-white p-4 lg:p-6">
 		<header class="card-header mb-6 flex items-center">
 			<h3 class="h3">{title}</h3>
@@ -85,6 +129,14 @@
 			<table class="table-hover table bg-white">
 				<thead>
 					<tr>
+						<th>
+							<input
+								type="checkbox"
+								bind:checked={selectAll}
+								on:change={onSelectAll}
+								class="checkbox"
+							/>
+						</th>
 						<th>ID</th>
 						<th>{$_('nsu')}</th>
 						<th>{$_('ssu')}</th>
@@ -94,6 +146,14 @@
 				<tbody>
 					{#each items as item}
 						<tr>
+							<td>
+								<input
+									type="checkbox"
+									checked={selectedIds.includes(item.id)}
+									on:change={() => onSelectItem(item.id)}
+									class="checkbox"
+								/>
+							</td>
 							<td style="width: 100px;">{item.id}</td>
 							<td>
 								<div class="flex items-center gap-4">
@@ -139,7 +199,7 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colspan="3" class="bg-white">Results Found {totalItems}</th>
+						<th colspan="4" class="bg-white">Results Found {totalItems}</th>
 						<td class="bg-white"></td>
 					</tr>
 				</tfoot>
@@ -162,3 +222,33 @@
 		</div>
 	</div>
 </div>
+
+{#if selectedIds.length > 0}
+	<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-4">
+		<div class="container mx-auto flex justify-end">
+			<button
+				type="button"
+				class="btn variant-filled-error text-white"
+				on:click={onBulkDelete}
+			>
+				Delete Selected ({selectedIds.length})
+			</button>
+		</div>
+	</div>
+{/if}
+
+<style>
+	.checkbox {
+		@apply h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500;
+	}
+
+	/* Add padding to the bottom of the page when the delete button is visible */
+	:global(body) {
+		padding-bottom: 80px;
+	}
+
+	/* Remove padding when no items are selected */
+	:global(body:not(.has-selected-items)) {
+		padding-bottom: 0;
+	}
+</style>

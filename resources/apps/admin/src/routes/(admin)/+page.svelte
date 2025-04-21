@@ -11,11 +11,9 @@
 	import { useToast } from '$lib/toast';
 	import { onMount } from 'svelte';
 	import LatestActivities from '$lib/components/LatestActivities.svelte';
-	import LatestAttendance from '$lib/components/LatestAttendance.svelte';
 	import MemberLogin from '$lib/components/MemberLogin.svelte';
 
 	let loading = false;
-	let attendance;
 
 	const api = useApi({
 		Authorization: getBearerToken()
@@ -59,8 +57,6 @@
 		}
 	};
 
-	const onReloadAttenance = () => attendance.reloadItems();
-
 	onMount(() => {
 		loadItems();
 	});
@@ -96,8 +92,7 @@
 	<div class="flex flex-col gap-6 lg:flex-row">
 		<LatestActivities />
 		<div class="flex flex-1 flex-col gap-6">
-			<MemberLogin on:load={onReloadAttenance} />
-			<LatestAttendance bind:this={attendance} />
+			<MemberLogin />
 		</div>
 	</div>
 </div>

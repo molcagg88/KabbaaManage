@@ -11,5 +11,11 @@
         "postcss": "^8.1.14",
         "vite": "^4.0.0"
     },
-    "dependencies": {}
+    "dependencies": {
+        "@fullcalendar/core": "^6.1.17",
+        "@fullcalendar/daygrid": "^6.1.17",
+        "@fullcalendar/interaction": "^6.1.17",
+        "@fullcalendar/timegrid": "^6.1.17",
+        "@fullcalendar/vue3": "^6.1.17"
+    }
 }
